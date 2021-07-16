@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+
+	<style>
+		.row{
+			width:600px;
+			clear:both;
+		}
+		
+		.row span{
+			width:100px;
+			height:20px;
+			display:block;
+			font-size:13px;
+			color:777777;
+			border:1px solid #cccccc;
+			border-width: 0px 0px 1px 0px;
+			padding:7px 0px 0px 0px;
+			float:left;
+			text-align:center;
+		}
+	</style>
+		
+		
+		
+	<script>
+	
+	var httpRequest = null;
+	//전역변수로 뺀 이유는 계속 써야하니까 return으로 받으면 부를때마다 객체를 만들기 때문에.
+	
+	function getHttpRequest(){
+		httpRequest = new XMLHttpRequest();
+		//ajax를 만들 수 있게 해주는 객체. 자바스크립트가 제공하는 내장객체임
+	}
+	
+	function getList(){
+		getHttpRequest();
+		//server에 있는 list.jsp를 호출할 것
+		httpRequest.onreadystatechange = callback;
+		//onreadystatechange 얘는 겟방식으로 "./list.jsp?userName=kje"를 호출해달라는말
+		httpRequest.open("GET","./list.jsp",true);
+		//post로 갈 경우 send자리에 매게변수를 붙여줘야한다.
+		httpRequest.send(null);
+	}
+	
+	function callback(){
+		//서버로부터 응답이 왔으므로알맞은 작업을 수행
+		if (httpRequest.readyState == 4) 
+			{
+			//실행이 끝났다는 신호
+			if (httpRequest.status == 200) 
+			{
+				var datas = httpRequest.responseXML;
+				//responseText는 화면에 찍힌 hi
+				setList(datas);
+			}
+			else{
+				
+				alert("실패:" + httpRequest.status);
+			}
+		}
+	}
+	
+	function setList(datas){
+		
+		var boards = datas.getElementsByTagName("row");
+		
+		var strHTML="";
+		for(var i=0;i<boards.length;i++){
+			var bnum = boards[i].childNodes[0].childNodes[0].nodeValue; //bnum
+			var title = boards[i].childNodes[1].childNodes[0].nodeValue; //title
+			var regdate = boards[i].childNodes[2].childNodes[0].nodeValue; //regdate
+			
+			strHTML += "<span style='width:100px;'>" + bnum + "</span>";
+			strHTML += "<span style='width:400px;'>" + title + "</span>";
+			strHTML += "<span style='width:100px;'>" + regdate + "</span>";
+		}
+		
+		document.getElementById("list").innerHTML = strHTML;
+	}
+		
+	
+	</script>
+</head>
+<body>
+
+	<div>
+		<input type="button" value="리스트가져오기" onclick="getList()" />
+	</div>
+	<div class="row">
+		<span style="width:100px;">글번호</span>
+		<span style="width:400px;">글제목</span>
+		<span style="width:100px;">작성일</span>
+	</div>
+	
+	<div class="row" id="list">
+		<!--<span style="width:100px;"></span>
+		<span style="width:400px;"></span>
+		<span style="width:100px;"></span>  -->
+	</div>
+</body>
+</html>
